@@ -2,12 +2,15 @@ FROM lukemathwalker/cargo-chef:0.1.62-rust-1.72-buster as chef
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl wget unzip
-RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip -O ./protoc.zip \
+
+RUN ARCHITECTURE=`dpkg --print-architecture` && if [ "$ARCHITECTURE" = "arm64" ]; then ARCHITECTURE=aarch_64; else ARCHITECTURE=x86_64; fi \
+    && wget "https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-$ARCHITECTURE.zip" -O ./protoc.zip \
           && unzip protoc.zip \
           && mv ./include/* /usr/include/ \
           && mv ./bin/protoc /usr/bin/protoc
 
-RUN wget https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v2.15.0/protoc-gen-openapiv2-v2.15.0-linux-x86_64 -O ./protoc-gen-openapiv2 \
+RUN ARCHITECTURE=`dpkg --print-architecture` && if [ "$ARCHITECTURE" = "arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=x86_64; fi \
+    && wget "https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v2.15.0/protoc-gen-openapiv2-v2.15.0-linux-$ARCHITECTURE" -O ./protoc-gen-openapiv2 \
           && chmod +x protoc-gen-openapiv2 \
           && mv ./protoc-gen-openapiv2 /usr/bin/protoc-gen-openapiv2
 
